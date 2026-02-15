@@ -1,0 +1,1819 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>TaskMarket — Neon Noir Design Preview</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Sans:wght@300;400;500;600&display=swap');
+
+/* ─── Custom Properties ─────────────────────────────────── */
+:root {
+  --bg-deep: #0A0A0F;
+  --bg-surface: #14141F;
+  --bg-elevated: #1E1E2E;
+  --bg-input: #12121C;
+  --accent-cyan: #00E5FF;
+  --accent-magenta: #FF3CAC;
+  --accent-amber: #FFAB00;
+  --accent-green: #00E676;
+  --text-primary: #E8E8F0;
+  --text-secondary: #8888A0;
+  --text-muted: #55556A;
+  --glass-border: rgba(255,255,255,0.08);
+  --glass-border-hover: rgba(255,255,255,0.15);
+  --glass-bg: rgba(20,20,31,0.65);
+  --glass-bg-solid: rgba(20,20,31,0.85);
+  --radius-sm: 8px;
+  --radius-md: 12px;
+  --radius-lg: 16px;
+  --radius-xl: 20px;
+  --glow-cyan: 0 0 20px rgba(0,229,255,0.3);
+  --glow-cyan-strong: 0 0 30px rgba(0,229,255,0.5), 0 0 60px rgba(0,229,255,0.15);
+  --glow-magenta: 0 0 20px rgba(255,60,172,0.3);
+  --glow-magenta-strong: 0 0 30px rgba(255,60,172,0.5);
+  --transition-base: 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-bounce: 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+  --font-heading: 'Space Grotesk', sans-serif;
+  --font-body: 'IBM Plex Sans', sans-serif;
+  --max-width: 1200px;
+}
+
+/* ─── Reset & Base ───────────────────────────────────────── */
+*, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
+
+html {
+  scroll-behavior: smooth;
+  scrollbar-width: thin;
+  scrollbar-color: var(--accent-cyan) var(--bg-deep);
+}
+
+body {
+  font-family: var(--font-body);
+  background: var(--bg-deep);
+  color: var(--text-primary);
+  line-height: 1.6;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+h1, h2, h3, h4, h5, h6 { font-family: var(--font-heading); font-weight: 600; line-height: 1.2; }
+
+a { color: var(--accent-cyan); text-decoration: none; transition: color var(--transition-base); }
+a:hover { color: #66F0FF; }
+
+img { max-width: 100%; display: block; }
+
+/* ─── Background Mesh ────────────────────────────────────── */
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background:
+    radial-gradient(circle at 15% 25%, rgba(0,229,255,0.04) 0%, transparent 50%),
+    radial-gradient(circle at 85% 75%, rgba(255,60,172,0.03) 0%, transparent 50%),
+    radial-gradient(circle at 50% 50%, rgba(0,229,255,0.015) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.dot-grid {
+  position: fixed;
+  inset: 0;
+  background-image: radial-gradient(circle, rgba(255,255,255,0.03) 1px, transparent 1px);
+  background-size: 32px 32px;
+  pointer-events: none;
+  z-index: 0;
+}
+
+/* ─── Layout ─────────────────────────────────────────────── */
+.container { max-width: var(--max-width); margin: 0 auto; padding: 0 24px; position: relative; z-index: 1; }
+.section { padding: 80px 0; position: relative; z-index: 1; }
+.section-label {
+  font-family: var(--font-heading);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 3px;
+  text-transform: uppercase;
+  color: var(--accent-cyan);
+  margin-bottom: 8px;
+  display: block;
+}
+.section-title {
+  font-size: clamp(1.5rem, 3vw, 2rem);
+  margin-bottom: 40px;
+  color: var(--text-primary);
+}
+.section-divider {
+  width: 100%;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, var(--glass-border), rgba(0,229,255,0.12), var(--glass-border), transparent);
+  margin: 0;
+  border: none;
+}
+
+/* ─── Glass Card ─────────────────────────────────────────── */
+.glass {
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  transition: border-color var(--transition-base), box-shadow var(--transition-base), transform var(--transition-base);
+}
+.glass:hover {
+  border-color: var(--glass-border-hover);
+}
+.glass-solid {
+  background: var(--glass-bg-solid);
+  backdrop-filter: blur(30px);
+  -webkit-backdrop-filter: blur(30px);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+}
+
+/* ─── Buttons ────────────────────────────────────────────── */
+.btn {
+  font-family: var(--font-heading);
+  font-size: 14px;
+  font-weight: 500;
+  padding: 10px 24px;
+  border-radius: var(--radius-sm);
+  border: none;
+  cursor: pointer;
+  transition: all var(--transition-base);
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  letter-spacing: 0.3px;
+  position: relative;
+  overflow: hidden;
+}
+.btn-primary {
+  background: linear-gradient(135deg, var(--accent-cyan), #00B8D4);
+  color: #0A0A0F;
+  font-weight: 600;
+}
+.btn-primary:hover {
+  box-shadow: var(--glow-cyan);
+  transform: translateY(-1px);
+}
+.btn-primary:active { transform: translateY(0); }
+
+.btn-gradient {
+  background: linear-gradient(135deg, var(--accent-cyan), var(--accent-magenta));
+  color: #0A0A0F;
+  font-weight: 600;
+}
+.btn-gradient:hover {
+  box-shadow: 0 0 25px rgba(0,229,255,0.3), 0 0 25px rgba(255,60,172,0.2);
+  transform: translateY(-1px);
+}
+
+.btn-ghost {
+  background: transparent;
+  color: var(--text-primary);
+  border: 1px solid var(--glass-border);
+}
+.btn-ghost:hover {
+  border-color: var(--accent-cyan);
+  color: var(--accent-cyan);
+  box-shadow: inset 0 0 20px rgba(0,229,255,0.05);
+}
+
+.btn-magenta {
+  background: linear-gradient(135deg, var(--accent-magenta), #E91E90);
+  color: white;
+  font-weight: 600;
+}
+.btn-magenta:hover {
+  box-shadow: var(--glow-magenta);
+  transform: translateY(-1px);
+}
+
+.btn-sm { padding: 6px 16px; font-size: 13px; }
+.btn-lg { padding: 14px 32px; font-size: 15px; }
+
+/* ─── Status Badges ──────────────────────────────────────── */
+.badge {
+  font-family: var(--font-heading);
+  font-size: 11px;
+  font-weight: 600;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  padding: 4px 12px;
+  border-radius: 100px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+}
+.badge::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+.badge-open {
+  background: rgba(0,229,255,0.1);
+  color: var(--accent-cyan);
+  border: 1px solid rgba(0,229,255,0.2);
+}
+.badge-open::before { background: var(--accent-cyan); box-shadow: 0 0 6px var(--accent-cyan); }
+
+.badge-assigned {
+  background: rgba(255,60,172,0.1);
+  color: var(--accent-magenta);
+  border: 1px solid rgba(255,60,172,0.2);
+}
+.badge-assigned::before { background: var(--accent-magenta); box-shadow: 0 0 6px var(--accent-magenta); }
+
+.badge-submitted {
+  background: rgba(255,171,0,0.1);
+  color: var(--accent-amber);
+  border: 1px solid rgba(255,171,0,0.2);
+}
+.badge-submitted::before { background: var(--accent-amber); box-shadow: 0 0 6px var(--accent-amber); }
+
+.badge-closed {
+  background: rgba(0,230,118,0.1);
+  color: var(--accent-green);
+  border: 1px solid rgba(0,230,118,0.2);
+}
+.badge-closed::before { background: var(--accent-green); box-shadow: 0 0 6px var(--accent-green); }
+
+/* ─── Inputs ─────────────────────────────────────────────── */
+.input-group { margin-bottom: 20px; }
+.input-group label {
+  display: block;
+  font-family: var(--font-heading);
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  margin-bottom: 6px;
+  letter-spacing: 0.3px;
+}
+.input-field {
+  width: 100%;
+  padding: 12px 16px;
+  background: var(--bg-input);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-sm);
+  color: var(--text-primary);
+  font-family: var(--font-body);
+  font-size: 14px;
+  transition: all var(--transition-base);
+  outline: none;
+}
+.input-field::placeholder { color: var(--text-muted); }
+.input-field:focus {
+  border-color: var(--accent-cyan);
+  box-shadow: 0 0 0 3px rgba(0,229,255,0.1), 0 0 20px rgba(0,229,255,0.08);
+}
+textarea.input-field { resize: vertical; min-height: 100px; }
+select.input-field {
+  appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' fill='%238888A0' viewBox='0 0 16 16'%3E%3Cpath d='M8 11L3 6h10z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  padding-right: 36px;
+}
+
+/* ─══════════════════════════════════════════════════════════
+   1. NAVIGATION BAR
+   ══════════════════════════════════════════════════════════ */
+.navbar {
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: rgba(10,10,15,0.8);
+  backdrop-filter: blur(24px);
+  -webkit-backdrop-filter: blur(24px);
+  border-bottom: 1px solid var(--glass-border);
+  padding: 0 24px;
+}
+.navbar-inner {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  height: 64px;
+}
+.navbar-logo {
+  font-family: var(--font-heading);
+  font-size: 22px;
+  font-weight: 700;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 3px;
+}
+.navbar-logo .accent {
+  color: var(--accent-cyan);
+  text-shadow: 0 0 20px rgba(0,229,255,0.5);
+}
+.navbar-links {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  list-style: none;
+}
+.navbar-links a {
+  font-family: var(--font-heading);
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--text-secondary);
+  padding: 8px 16px;
+  border-radius: var(--radius-sm);
+  transition: all var(--transition-base);
+  position: relative;
+}
+.navbar-links a:hover {
+  color: var(--accent-cyan);
+  background: rgba(0,229,255,0.05);
+  text-shadow: 0 0 12px rgba(0,229,255,0.4);
+}
+.navbar-links a.active {
+  color: var(--accent-cyan);
+  background: rgba(0,229,255,0.08);
+}
+.navbar-right {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.navbar-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent-cyan), var(--accent-magenta));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-heading);
+  font-size: 14px;
+  font-weight: 600;
+  color: var(--bg-deep);
+  border: 2px solid transparent;
+  transition: all var(--transition-base);
+  cursor: pointer;
+}
+.navbar-avatar:hover {
+  box-shadow: 0 0 16px rgba(0,229,255,0.4);
+  border-color: var(--accent-cyan);
+}
+
+/* mobile nav */
+.navbar-toggle { display: none; background: none; border: none; cursor: pointer; padding: 4px; }
+.navbar-toggle span {
+  display: block;
+  width: 22px;
+  height: 2px;
+  background: var(--text-primary);
+  margin: 5px 0;
+  border-radius: 2px;
+  transition: var(--transition-base);
+}
+
+/* ─══════════════════════════════════════════════════════════
+   2. HERO SECTION
+   ══════════════════════════════════════════════════════════ */
+.hero {
+  padding: 100px 0 80px;
+  text-align: center;
+  position: relative;
+  overflow: hidden;
+}
+.hero::before {
+  content: '';
+  position: absolute;
+  top: -40%;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 800px;
+  height: 800px;
+  background: radial-gradient(circle, rgba(0,229,255,0.06) 0%, transparent 70%);
+  pointer-events: none;
+}
+.hero-headline {
+  font-size: clamp(2.2rem, 6vw, 4rem);
+  font-weight: 700;
+  line-height: 1.1;
+  margin-bottom: 20px;
+  background: linear-gradient(135deg, var(--accent-cyan) 0%, #66F0FF 25%, var(--accent-magenta) 75%, #FF6EC7 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  animation: gradientShift 6s ease-in-out infinite alternate;
+  background-size: 200% 200%;
+}
+@keyframes gradientShift {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 100% 50%; }
+}
+.hero-sub {
+  font-size: clamp(1rem, 2vw, 1.2rem);
+  color: var(--text-secondary);
+  max-width: 560px;
+  margin: 0 auto 40px;
+  font-weight: 300;
+}
+.hero-search {
+  max-width: 600px;
+  margin: 0 auto;
+  position: relative;
+}
+.hero-search .input-field {
+  padding: 16px 140px 16px 48px;
+  font-size: 15px;
+  border-radius: var(--radius-lg);
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px);
+  border: 1px solid var(--glass-border);
+}
+.hero-search .input-field:focus {
+  border-color: var(--accent-cyan);
+  box-shadow: 0 0 0 4px rgba(0,229,255,0.08), var(--glow-cyan);
+}
+.hero-search-icon {
+  position: absolute;
+  left: 16px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: var(--text-muted);
+  pointer-events: none;
+}
+.hero-search .btn {
+  position: absolute;
+  right: 6px;
+  top: 50%;
+  transform: translateY(-50%);
+}
+.hero-stats {
+  display: flex;
+  justify-content: center;
+  gap: 48px;
+  margin-top: 48px;
+}
+.hero-stat { text-align: center; }
+.hero-stat-value {
+  font-family: var(--font-heading);
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--accent-cyan);
+  text-shadow: 0 0 20px rgba(0,229,255,0.3);
+}
+.hero-stat-label {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-top: 4px;
+}
+
+/* ─══════════════════════════════════════════════════════════
+   3. TASK FEED
+   ══════════════════════════════════════════════════════════ */
+.task-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+  gap: 20px;
+}
+.task-card {
+  padding: 24px;
+  cursor: pointer;
+  position: relative;
+  overflow: hidden;
+}
+.task-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: var(--radius-lg);
+  background: linear-gradient(135deg, rgba(0,229,255,0.02), transparent 60%);
+  opacity: 0;
+  transition: opacity var(--transition-base);
+}
+.task-card:hover::before { opacity: 1; }
+.task-card:hover {
+  border-color: rgba(0,229,255,0.15);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.3), 0 0 0 1px rgba(0,229,255,0.08);
+  transform: translateY(-2px);
+}
+.task-card-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  margin-bottom: 12px;
+  gap: 12px;
+}
+.task-card-title {
+  font-family: var(--font-heading);
+  font-size: 16px;
+  font-weight: 600;
+  color: var(--text-primary);
+  line-height: 1.3;
+}
+.task-card-desc {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin-bottom: 16px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.task-card-budget {
+  font-family: var(--font-heading);
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--accent-cyan);
+  text-shadow: 0 0 15px rgba(0,229,255,0.25);
+  margin-bottom: 16px;
+}
+.task-card-budget span {
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text-muted);
+  margin-left: 2px;
+}
+.task-card-footer {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-top: 14px;
+  border-top: 1px solid var(--glass-border);
+}
+.task-card-meta {
+  font-size: 12px;
+  color: var(--text-muted);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+.task-card-meta .avatar-sm {
+  width: 20px;
+  height: 20px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent-cyan), var(--accent-magenta));
+  flex-shrink: 0;
+}
+.task-card-time {
+  font-size: 12px;
+  color: var(--text-muted);
+}
+
+/* ─══════════════════════════════════════════════════════════
+   4. TASK DETAIL PANEL
+   ══════════════════════════════════════════════════════════ */
+.detail-panel {
+  padding: 32px;
+  max-width: 800px;
+  margin: 0 auto;
+}
+.detail-title {
+  font-size: 26px;
+  font-weight: 700;
+  margin-bottom: 8px;
+}
+.detail-meta-row {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-bottom: 24px;
+}
+.detail-budget {
+  font-family: var(--font-heading);
+  font-size: 24px;
+  font-weight: 700;
+  color: var(--accent-cyan);
+  text-shadow: 0 0 20px rgba(0,229,255,0.3);
+}
+.detail-desc {
+  color: var(--text-secondary);
+  font-size: 15px;
+  line-height: 1.7;
+  margin-bottom: 32px;
+}
+.detail-section-title {
+  font-family: var(--font-heading);
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+.detail-section-title .count {
+  background: rgba(0,229,255,0.1);
+  color: var(--accent-cyan);
+  font-size: 12px;
+  padding: 2px 10px;
+  border-radius: 100px;
+}
+.offer-card {
+  padding: 20px;
+  margin-bottom: 12px;
+  background: var(--bg-surface);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-md);
+  transition: border-color var(--transition-base);
+}
+.offer-card:hover {
+  border-color: rgba(0,229,255,0.15);
+}
+.offer-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 10px;
+}
+.offer-user {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+.offer-avatar {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent-magenta), #FF6EC7);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-heading);
+  font-size: 12px;
+  font-weight: 600;
+  color: white;
+}
+.offer-name {
+  font-family: var(--font-heading);
+  font-weight: 600;
+  font-size: 14px;
+}
+.offer-amount {
+  font-family: var(--font-heading);
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--accent-cyan);
+}
+.offer-message {
+  font-size: 13px;
+  color: var(--text-secondary);
+  line-height: 1.5;
+  margin-bottom: 12px;
+}
+.offer-actions { display: flex; gap: 8px; }
+
+.detail-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 28px;
+  flex-wrap: wrap;
+}
+
+/* ─══════════════════════════════════════════════════════════
+   5. CREATE / EDIT TASK FORM
+   ══════════════════════════════════════════════════════════ */
+.form-panel {
+  padding: 32px;
+  max-width: 640px;
+  margin: 0 auto;
+}
+.form-panel .form-title {
+  font-size: 22px;
+  font-weight: 700;
+  margin-bottom: 28px;
+}
+.form-row {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+}
+
+/* ─══════════════════════════════════════════════════════════
+   6. CHAT UI
+   ══════════════════════════════════════════════════════════ */
+.chat-container {
+  max-width: 640px;
+  margin: 0 auto;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  border: 1px solid var(--glass-border);
+  background: var(--bg-surface);
+}
+.chat-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 16px 20px;
+  background: var(--bg-elevated);
+  border-bottom: 1px solid var(--glass-border);
+}
+.chat-header-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent-magenta), #E91E90);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-heading);
+  font-size: 14px;
+  font-weight: 600;
+  color: white;
+}
+.chat-header-name {
+  font-family: var(--font-heading);
+  font-weight: 600;
+  font-size: 15px;
+}
+.chat-header-status {
+  font-size: 12px;
+  color: var(--accent-green);
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+.chat-header-status::before {
+  content: '';
+  width: 6px;
+  height: 6px;
+  background: var(--accent-green);
+  border-radius: 50%;
+  box-shadow: 0 0 6px var(--accent-green);
+}
+.chat-messages {
+  padding: 20px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  min-height: 320px;
+  max-height: 400px;
+  overflow-y: auto;
+}
+.chat-msg {
+  max-width: 75%;
+  display: flex;
+  flex-direction: column;
+}
+.chat-msg-sent { align-self: flex-end; }
+.chat-msg-received { align-self: flex-start; }
+.chat-bubble {
+  padding: 12px 16px;
+  border-radius: var(--radius-md);
+  font-size: 14px;
+  line-height: 1.5;
+  position: relative;
+}
+.chat-msg-sent .chat-bubble {
+  background: linear-gradient(135deg, rgba(0,229,255,0.15), rgba(0,229,255,0.08));
+  border: 1px solid rgba(0,229,255,0.2);
+  border-bottom-right-radius: 4px;
+  color: var(--text-primary);
+}
+.chat-msg-received .chat-bubble {
+  background: var(--bg-elevated);
+  border: 1px solid var(--glass-border);
+  border-bottom-left-radius: 4px;
+  color: var(--text-primary);
+}
+.chat-time {
+  font-size: 11px;
+  color: var(--text-muted);
+  margin-top: 4px;
+  padding: 0 4px;
+}
+.chat-msg-sent .chat-time { text-align: right; }
+.chat-input-bar {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 14px 16px;
+  border-top: 1px solid var(--glass-border);
+  background: var(--bg-elevated);
+}
+.chat-input-bar .input-field {
+  flex: 1;
+  padding: 10px 14px;
+  border-radius: 100px;
+}
+.chat-send-btn {
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  border: none;
+  background: linear-gradient(135deg, var(--accent-cyan), #00B8D4);
+  color: var(--bg-deep);
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all var(--transition-base);
+  flex-shrink: 0;
+}
+.chat-send-btn:hover {
+  box-shadow: var(--glow-cyan);
+  transform: scale(1.05);
+}
+
+/* ─══════════════════════════════════════════════════════════
+   7. TASK DASHBOARD
+   ══════════════════════════════════════════════════════════ */
+.dashboard-table-wrap {
+  overflow-x: auto;
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--glass-border);
+  background: var(--glass-bg);
+  backdrop-filter: blur(20px);
+}
+.dashboard-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 14px;
+}
+.dashboard-table thead th {
+  font-family: var(--font-heading);
+  font-size: 12px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text-muted);
+  padding: 14px 20px;
+  text-align: left;
+  border-bottom: 1px solid var(--glass-border);
+  background: var(--bg-elevated);
+  white-space: nowrap;
+}
+.dashboard-table thead th:first-child { border-radius: var(--radius-lg) 0 0 0; }
+.dashboard-table thead th:last-child { border-radius: 0 var(--radius-lg) 0 0; }
+.dashboard-table tbody td {
+  padding: 14px 20px;
+  border-bottom: 1px solid rgba(255,255,255,0.03);
+  vertical-align: middle;
+  white-space: nowrap;
+}
+.dashboard-table tbody tr {
+  transition: background var(--transition-base);
+}
+.dashboard-table tbody tr:hover {
+  background: rgba(0,229,255,0.02);
+}
+.dashboard-table tbody tr:last-child td { border-bottom: none; }
+.dash-title-cell {
+  font-family: var(--font-heading);
+  font-weight: 500;
+  color: var(--text-primary);
+  white-space: normal;
+  min-width: 200px;
+}
+.dash-budget {
+  font-family: var(--font-heading);
+  font-weight: 600;
+  color: var(--accent-cyan);
+}
+
+/* ─══════════════════════════════════════════════════════════
+   8. PROFILE + REVIEWS
+   ══════════════════════════════════════════════════════════ */
+.profile-layout {
+  display: grid;
+  grid-template-columns: 300px 1fr;
+  gap: 24px;
+  align-items: start;
+}
+.profile-card {
+  padding: 32px;
+  text-align: center;
+}
+.profile-avatar {
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent-cyan), var(--accent-magenta));
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin: 0 auto 16px;
+  font-family: var(--font-heading);
+  font-size: 28px;
+  font-weight: 700;
+  color: var(--bg-deep);
+  box-shadow: 0 0 30px rgba(0,229,255,0.2);
+}
+.profile-name {
+  font-family: var(--font-heading);
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+.profile-handle {
+  font-size: 13px;
+  color: var(--text-muted);
+  margin-bottom: 16px;
+}
+.profile-stars {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 3px;
+  margin-bottom: 8px;
+}
+.star {
+  color: var(--accent-amber);
+  font-size: 18px;
+  text-shadow: 0 0 8px rgba(255,171,0,0.4);
+}
+.star.empty { color: var(--text-muted); text-shadow: none; opacity: 0.3; }
+.profile-rating-text {
+  font-family: var(--font-heading);
+  font-size: 14px;
+  color: var(--text-secondary);
+  margin-bottom: 20px;
+}
+.profile-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1px;
+  background: var(--glass-border);
+  border-radius: var(--radius-sm);
+  overflow: hidden;
+  margin-top: 16px;
+}
+.profile-stat {
+  padding: 14px;
+  text-align: center;
+  background: var(--bg-surface);
+}
+.profile-stat-val {
+  font-family: var(--font-heading);
+  font-size: 20px;
+  font-weight: 700;
+  color: var(--accent-cyan);
+}
+.profile-stat-lbl {
+  font-size: 11px;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  margin-top: 2px;
+}
+.reviews-list { display: flex; flex-direction: column; gap: 16px; }
+.review-card {
+  padding: 20px;
+}
+.review-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 10px;
+}
+.review-avatar {
+  width: 36px;
+  height: 36px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--accent-cyan), #00B8D4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-family: var(--font-heading);
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--bg-deep);
+}
+.review-author {
+  font-family: var(--font-heading);
+  font-weight: 600;
+  font-size: 14px;
+}
+.review-date { font-size: 12px; color: var(--text-muted); }
+.review-stars {
+  display: flex;
+  gap: 2px;
+  margin-bottom: 8px;
+}
+.review-stars .star { font-size: 14px; }
+.review-text {
+  font-size: 14px;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+/* ─══════════════════════════════════════════════════════════
+   9. AUTH FORMS
+   ══════════════════════════════════════════════════════════ */
+.auth-section { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; }
+.auth-panel {
+  padding: 32px;
+  max-width: 420px;
+}
+.auth-panel .form-title {
+  font-size: 22px;
+  font-weight: 700;
+  margin-bottom: 6px;
+}
+.auth-panel .form-sub {
+  font-size: 14px;
+  color: var(--text-secondary);
+  margin-bottom: 24px;
+}
+.auth-divider {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: 20px 0;
+  color: var(--text-muted);
+  font-size: 12px;
+}
+.auth-divider::before, .auth-divider::after {
+  content: '';
+  flex: 1;
+  height: 1px;
+  background: var(--glass-border);
+}
+
+/* ─══════════════════════════════════════════════════════════
+   10. REPORT MODAL
+   ══════════════════════════════════════════════════════════ */
+.modal-overlay {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  background: rgba(10,10,15,0.5);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--glass-border);
+}
+.modal-dialog {
+  width: 100%;
+  max-width: 440px;
+  padding: 28px;
+  background: var(--bg-surface);
+  border: 1px solid var(--glass-border);
+  border-radius: var(--radius-lg);
+  box-shadow: 0 24px 80px rgba(0,0,0,0.6);
+  position: relative;
+}
+.modal-close {
+  position: absolute;
+  top: 16px;
+  right: 16px;
+  background: none;
+  border: none;
+  color: var(--text-muted);
+  font-size: 20px;
+  cursor: pointer;
+  width: 32px;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-sm);
+  transition: all var(--transition-base);
+}
+.modal-close:hover {
+  background: rgba(255,255,255,0.05);
+  color: var(--text-primary);
+}
+.modal-title {
+  font-size: 20px;
+  font-weight: 700;
+  margin-bottom: 4px;
+}
+.modal-sub {
+  font-size: 13px;
+  color: var(--text-secondary);
+  margin-bottom: 20px;
+}
+.modal-actions {
+  display: flex;
+  gap: 10px;
+  justify-content: flex-end;
+  margin-top: 8px;
+}
+
+/* ─══════════════════════════════════════════════════════════
+   11. FOOTER
+   ══════════════════════════════════════════════════════════ */
+.footer {
+  border-top: 1px solid var(--glass-border);
+  padding: 40px 24px;
+  position: relative;
+  z-index: 1;
+}
+.footer::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: linear-gradient(90deg, transparent, rgba(0,229,255,0.2), rgba(255,60,172,0.15), transparent);
+}
+.footer-inner {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+}
+.footer-logo {
+  font-family: var(--font-heading);
+  font-size: 18px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+.footer-logo .accent { color: var(--accent-cyan); }
+.footer-links {
+  display: flex;
+  gap: 24px;
+  list-style: none;
+}
+.footer-links a {
+  font-size: 13px;
+  color: var(--text-muted);
+  transition: color var(--transition-base);
+}
+.footer-links a:hover { color: var(--accent-cyan); }
+.footer-copy {
+  font-size: 12px;
+  color: var(--text-muted);
+  width: 100%;
+  text-align: center;
+  margin-top: 16px;
+}
+
+/* ─── Utilities ──────────────────────────────────────────── */
+.sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0,0,0,0); border: 0; }
+
+/* ─── Animations ─────────────────────────────────────────── */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 20px rgba(0,229,255,0.15); }
+  50% { box-shadow: 0 0 30px rgba(0,229,255,0.3); }
+}
+
+.animate-in {
+  animation: fadeInUp 0.5s ease-out both;
+}
+
+/* ─── Responsive ─────────────────────────────────────────── */
+@media (max-width: 900px) {
+  .profile-layout { grid-template-columns: 1fr; }
+  .auth-section { grid-template-columns: 1fr; }
+  .form-row { grid-template-columns: 1fr; }
+  .hero-stats { gap: 32px; }
+}
+@media (max-width: 768px) {
+  .navbar-links { display: none; }
+  .navbar-toggle { display: block; }
+  .hero { padding: 60px 0 50px; }
+  .hero-stats { flex-direction: column; gap: 16px; }
+  .section { padding: 50px 0; }
+  .detail-panel, .form-panel { padding: 20px; }
+  .task-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 480px) {
+  .container { padding: 0 16px; }
+  .auth-panel { padding: 20px; }
+  .detail-actions { flex-direction: column; }
+  .detail-actions .btn { width: 100%; justify-content: center; }
+}
+</style>
+</head>
+<body>
+
+<div class="dot-grid" aria-hidden="true"></div>
+
+<!-- ═════════════════════════════════════════════════════════
+     1. NAVIGATION BAR
+     ═════════════════════════════════════════════════════════ -->
+<nav class="navbar">
+  <div class="navbar-inner">
+    <div class="navbar-logo">Task<span class="accent">Market</span></div>
+    <ul class="navbar-links">
+      <li><a href="#tasks" class="active">Browse Tasks</a></li>
+      <li><a href="#dashboard">My Dashboard</a></li>
+      <li><a href="#chat">Messages</a></li>
+      <li><a href="#profile">Profile</a></li>
+    </ul>
+    <div class="navbar-right">
+      <button class="btn btn-ghost btn-sm">Log In</button>
+      <button class="btn btn-primary btn-sm">Sign Up</button>
+      <div class="navbar-avatar" title="Arish R.">AR</div>
+    </div>
+    <button class="navbar-toggle" aria-label="Toggle menu">
+      <span></span><span></span><span></span>
+    </button>
+  </div>
+</nav>
+
+<!-- ═════════════════════════════════════════════════════════
+     2. HERO / LANDING SECTION
+     ═════════════════════════════════════════════════════════ -->
+<section class="hero" id="hero">
+  <div class="container">
+    <h1 class="hero-headline animate-in">Get things done.<br>Get paid doing them.</h1>
+    <p class="hero-sub animate-in" style="animation-delay:.1s">Post a task, find skilled people nearby. Payment handled directly between you — no middleman fees.</p>
+    <div class="hero-search animate-in" style="animation-delay:.2s">
+      <svg class="hero-search-icon" width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/></svg>
+      <input class="input-field" type="text" placeholder="Search tasks — &quot;logo design&quot;, &quot;plumbing&quot;, &quot;translation&quot;…">
+      <button class="btn btn-primary btn-sm">Search</button>
+    </div>
+    <div class="hero-stats animate-in" style="animation-delay:.3s">
+      <div class="hero-stat">
+        <div class="hero-stat-value">2,480</div>
+        <div class="hero-stat-label">Tasks Posted</div>
+      </div>
+      <div class="hero-stat">
+        <div class="hero-stat-value">1,120</div>
+        <div class="hero-stat-label">Active Fulfillers</div>
+      </div>
+      <div class="hero-stat">
+        <div class="hero-stat-value">INR 4.2M</div>
+        <div class="hero-stat-label">Total Earned</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="section-divider">
+
+<!-- ═════════════════════════════════════════════════════════
+     3. TASK FEED
+     ═════════════════════════════════════════════════════════ -->
+<section class="section" id="tasks">
+  <div class="container">
+    <span class="section-label">Browse</span>
+    <h2 class="section-title">Open Tasks</h2>
+    <div class="task-grid">
+
+      <!-- Card 1 -->
+      <article class="task-card glass">
+        <div class="task-card-header">
+          <h3 class="task-card-title">Fix leaking kitchen faucet</h3>
+          <span class="badge badge-open">Open</span>
+        </div>
+        <p class="task-card-desc">My kitchen faucet has been dripping for a week. Need an experienced plumber to fix or replace it. Parts will be provided.</p>
+        <div class="task-card-budget">INR 3,500</div>
+        <div class="task-card-footer">
+          <span class="task-card-meta"><span class="avatar-sm"></span> Ahmed K.</span>
+          <span class="task-card-time">3 hours ago</span>
+        </div>
+      </article>
+
+      <!-- Card 2 -->
+      <article class="task-card glass">
+        <div class="task-card-header">
+          <h3 class="task-card-title">Design a logo for my bakery</h3>
+          <span class="badge badge-open">Open</span>
+        </div>
+        <p class="task-card-desc">Looking for a creative designer to make a modern, clean logo for "Naan Stop Bakery". Should work on dark and light backgrounds.</p>
+        <div class="task-card-budget">INR 8,000</div>
+        <div class="task-card-footer">
+          <span class="task-card-meta"><span class="avatar-sm"></span> Sara M.</span>
+          <span class="task-card-time">5 hours ago</span>
+        </div>
+      </article>
+
+      <!-- Card 3 -->
+      <article class="task-card glass">
+        <div class="task-card-header">
+          <h3 class="task-card-title">Translate 5 pages Urdu to English</h3>
+          <span class="badge badge-assigned">Assigned</span>
+        </div>
+        <p class="task-card-desc">Need accurate translation of 5 official documents from Urdu to English. Must maintain formatting and legal terminology.</p>
+        <div class="task-card-budget">INR 2,000</div>
+        <div class="task-card-footer">
+          <span class="task-card-meta"><span class="avatar-sm"></span> Bilal H.</span>
+          <span class="task-card-time">1 day ago</span>
+        </div>
+      </article>
+
+      <!-- Card 4 -->
+      <article class="task-card glass">
+        <div class="task-card-header">
+          <h3 class="task-card-title">Move furniture to new apartment</h3>
+          <span class="badge badge-open">Open</span>
+        </div>
+        <p class="task-card-desc">Relocating from F-8 to G-11. Need 2-3 people to help load, transport, and unload heavy furniture. Vehicle provided.</p>
+        <div class="task-card-budget">INR 5,000</div>
+        <div class="task-card-footer">
+          <span class="task-card-meta"><span class="avatar-sm"></span> Fatima Z.</span>
+          <span class="task-card-time">12 hours ago</span>
+        </div>
+      </article>
+
+    </div>
+  </div>
+</section>
+
+<hr class="section-divider">
+
+<!-- ═════════════════════════════════════════════════════════
+     4. TASK DETAIL PANEL
+     ═════════════════════════════════════════════════════════ -->
+<section class="section" id="detail">
+  <div class="container">
+    <span class="section-label">Task Detail</span>
+    <div class="detail-panel glass-solid">
+      <h2 class="detail-title">Design a logo for my bakery</h2>
+      <div class="detail-meta-row">
+        <span class="detail-budget">INR 8,000</span>
+        <span class="badge badge-open">Open</span>
+        <span style="color:var(--text-muted);font-size:13px">Posted by <strong style="color:var(--text-primary)">Sara M.</strong> · 5 hours ago</span>
+      </div>
+      <p class="detail-desc">Looking for a creative designer to make a modern, clean logo for "Naan Stop Bakery". The bakery specializes in artisan breads and traditional Pakistani pastries. Logo should work well on signage, packaging, and social media. Prefer warm tones with a modern feel. Please include at least 3 initial concepts. Revisions will be needed after the first round.</p>
+
+      <h3 class="detail-section-title">Offers <span class="count">2</span></h3>
+
+      <div class="offer-card">
+        <div class="offer-header">
+          <div class="offer-user">
+            <div class="offer-avatar">HN</div>
+            <div>
+              <div class="offer-name">Hassan N.</div>
+              <div style="font-size:12px;color:var(--text-muted)">★ 4.8 · 23 tasks completed</div>
+            </div>
+          </div>
+          <div class="offer-amount">INR 7,000</div>
+        </div>
+        <p class="offer-message">Hi Sara! I specialize in food & bakery branding. I'll deliver 3 concepts within 48 hours with unlimited revisions. Happy to discuss your vision first.</p>
+        <div class="offer-actions">
+          <button class="btn btn-primary btn-sm">Accept Offer</button>
+          <button class="btn btn-ghost btn-sm">Message</button>
+        </div>
+      </div>
+
+      <div class="offer-card">
+        <div class="offer-header">
+          <div class="offer-user">
+            <div class="offer-avatar" style="background:linear-gradient(135deg, var(--accent-cyan), #0088A0)">RA</div>
+            <div>
+              <div class="offer-name">Rabia A.</div>
+              <div style="font-size:12px;color:var(--text-muted)">★ 4.5 · 11 tasks completed</div>
+            </div>
+          </div>
+          <div class="offer-amount">INR 6,500</div>
+        </div>
+        <p class="offer-message">I've designed logos for 3 bakeries in Islamabad — check my portfolio. Can start immediately. 2-day turnaround for initial concepts.</p>
+        <div class="offer-actions">
+          <button class="btn btn-primary btn-sm">Accept Offer</button>
+          <button class="btn btn-ghost btn-sm">Message</button>
+        </div>
+      </div>
+
+      <div class="detail-actions">
+        <button class="btn btn-gradient">Submit an Offer</button>
+        <button class="btn btn-ghost">
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg>
+          Share
+        </button>
+        <button class="btn btn-ghost" style="color:var(--accent-magenta);border-color:rgba(255,60,172,0.2)">
+          <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 3l18 18M10.5 10.5a3 3 0 004.95 4.95"/><path d="M13.73 21H7a2 2 0 01-2-2v-3M18 13v6a2 2 0 01-2 2h-1.73"/></svg>
+          Report
+        </button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="section-divider">
+
+<!-- ═════════════════════════════════════════════════════════
+     5. CREATE / EDIT TASK FORM
+     ═════════════════════════════════════════════════════════ -->
+<section class="section" id="create">
+  <div class="container">
+    <span class="section-label">Create</span>
+    <div class="form-panel glass-solid">
+      <h2 class="form-title">Post a New Task</h2>
+      <form onsubmit="return false">
+        <div class="input-group">
+          <label for="task-title">Task Title</label>
+          <input id="task-title" class="input-field" type="text" placeholder="e.g. Fix leaking kitchen faucet">
+        </div>
+        <div class="input-group">
+          <label for="task-desc">Description</label>
+          <textarea id="task-desc" class="input-field" placeholder="Describe what needs to be done, any requirements, and your location…"></textarea>
+        </div>
+        <div class="form-row">
+          <div class="input-group">
+            <label for="task-budget">Budget</label>
+            <input id="task-budget" class="input-field" type="number" placeholder="5000">
+          </div>
+          <div class="input-group">
+            <label for="task-currency">Currency</label>
+            <select id="task-currency" class="input-field">
+              <option value="INR" selected>INR — Pakistani Rupee</option>
+              <option value="USD">USD — US Dollar</option>
+              <option value="GBP">GBP — British Pound</option>
+            </select>
+          </div>
+        </div>
+        <div class="input-group">
+          <label for="task-category">Category</label>
+          <select id="task-category" class="input-field">
+            <option value="">Select a category…</option>
+            <option>Home Repair</option>
+            <option>Design & Creative</option>
+            <option>Translation</option>
+            <option>Moving & Delivery</option>
+            <option>Tech & IT</option>
+            <option>Other</option>
+          </select>
+        </div>
+        <button type="submit" class="btn btn-gradient btn-lg" style="width:100%;justify-content:center;margin-top:8px">Publish Task</button>
+      </form>
+    </div>
+  </div>
+</section>
+
+<hr class="section-divider">
+
+<!-- ═════════════════════════════════════════════════════════
+     6. CHAT UI
+     ═════════════════════════════════════════════════════════ -->
+<section class="section" id="chat">
+  <div class="container">
+    <span class="section-label">Messages</span>
+    <h2 class="section-title">Chat</h2>
+    <div class="chat-container">
+      <div class="chat-header">
+        <div class="chat-header-avatar">HN</div>
+        <div>
+          <div class="chat-header-name">Hassan N.</div>
+          <div class="chat-header-status">Online</div>
+        </div>
+      </div>
+      <div class="chat-messages">
+        <div class="chat-msg chat-msg-received">
+          <div class="chat-bubble">Hi Sara! I saw your bakery logo task. I've done similar work for "Tandoor Tales" — would you like to see those designs?</div>
+          <span class="chat-time">2:14 PM</span>
+        </div>
+        <div class="chat-msg chat-msg-sent">
+          <div class="chat-bubble">Yes please! That would be helpful. Also, we want to emphasize artisan breads in the logo, not just pastries.</div>
+          <span class="chat-time">2:16 PM</span>
+        </div>
+        <div class="chat-msg chat-msg-received">
+          <div class="chat-bubble">Great — I'll focus on a wheat/bread motif paired with clean typography. I'll have mockups ready by tomorrow evening, inshallah.</div>
+          <span class="chat-time">2:18 PM</span>
+        </div>
+        <div class="chat-msg chat-msg-sent">
+          <div class="chat-bubble">Sounds perfect! Looking forward to it 👍</div>
+          <span class="chat-time">2:19 PM</span>
+        </div>
+        <div class="chat-msg chat-msg-received">
+          <div class="chat-bubble">One question — do you have a preference for the color palette? You mentioned warm tones. Any specific colors in mind?</div>
+          <span class="chat-time">2:22 PM</span>
+        </div>
+      </div>
+      <div class="chat-input-bar">
+        <input class="input-field" type="text" placeholder="Type a message…">
+        <button class="chat-send-btn" aria-label="Send message">
+          <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="m22 2-7 20-4-9-9-4z"/><path d="m22 2-11 11"/></svg>
+        </button>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="section-divider">
+
+<!-- ═════════════════════════════════════════════════════════
+     7. TASK DASHBOARD
+     ═════════════════════════════════════════════════════════ -->
+<section class="section" id="dashboard">
+  <div class="container">
+    <span class="section-label">Dashboard</span>
+    <h2 class="section-title">My Tasks</h2>
+    <div class="dashboard-table-wrap">
+      <table class="dashboard-table">
+        <thead>
+          <tr>
+            <th>Task</th>
+            <th>Budget</th>
+            <th>Status</th>
+            <th>Role</th>
+            <th>Action</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="dash-title-cell">Design a logo for my bakery</td>
+            <td class="dash-budget">INR 8,000</td>
+            <td><span class="badge badge-assigned">Assigned</span></td>
+            <td style="color:var(--text-secondary)">Requester</td>
+            <td><button class="btn btn-ghost btn-sm">View</button></td>
+          </tr>
+          <tr>
+            <td class="dash-title-cell">Fix leaking kitchen faucet</td>
+            <td class="dash-budget">INR 3,500</td>
+            <td><span class="badge badge-submitted">Work Submitted</span></td>
+            <td style="color:var(--text-secondary)">Fulfiller</td>
+            <td><button class="btn btn-primary btn-sm">Confirm Payment</button></td>
+          </tr>
+          <tr>
+            <td class="dash-title-cell">Translate 5 pages Urdu to English</td>
+            <td class="dash-budget">INR 2,000</td>
+            <td><span class="badge badge-assigned">Assigned</span></td>
+            <td style="color:var(--text-secondary)">Fulfiller</td>
+            <td><button class="btn btn-gradient btn-sm">Submit Work</button></td>
+          </tr>
+          <tr>
+            <td class="dash-title-cell">Build WordPress portfolio site</td>
+            <td class="dash-budget">INR 15,000</td>
+            <td><span class="badge badge-closed">Closed</span></td>
+            <td style="color:var(--text-secondary)">Fulfiller</td>
+            <td><button class="btn btn-ghost btn-sm">Leave Review</button></td>
+          </tr>
+          <tr>
+            <td class="dash-title-cell">Tutor my son in Maths (Grade 8)</td>
+            <td class="dash-budget">INR 6,000</td>
+            <td><span class="badge badge-open">Open</span></td>
+            <td style="color:var(--text-secondary)">Requester</td>
+            <td><button class="btn btn-ghost btn-sm">Edit</button></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<hr class="section-divider">
+
+<!-- ═════════════════════════════════════════════════════════
+     8. PROFILE + REVIEWS
+     ═════════════════════════════════════════════════════════ -->
+<section class="section" id="profile">
+  <div class="container">
+    <span class="section-label">Profile</span>
+    <h2 class="section-title">User Profile</h2>
+    <div class="profile-layout">
+      <div class="profile-card glass-solid">
+        <div class="profile-avatar">AR</div>
+        <div class="profile-name">Arish Rehman</div>
+        <div class="profile-handle">@arish_rehman · Islamabad</div>
+        <div class="profile-stars">
+          <span class="star">★</span>
+          <span class="star">★</span>
+          <span class="star">★</span>
+          <span class="star">★</span>
+          <span class="star empty">★</span>
+        </div>
+        <div class="profile-rating-text">4.2 / 5.0 — 18 reviews</div>
+        <button class="btn btn-ghost btn-sm" style="width:100%;justify-content:center">Edit Profile</button>
+        <div class="profile-stats">
+          <div class="profile-stat">
+            <div class="profile-stat-val">12</div>
+            <div class="profile-stat-lbl">Posted</div>
+          </div>
+          <div class="profile-stat">
+            <div class="profile-stat-val">24</div>
+            <div class="profile-stat-lbl">Fulfilled</div>
+          </div>
+          <div class="profile-stat">
+            <div class="profile-stat-val">94%</div>
+            <div class="profile-stat-lbl">Completion</div>
+          </div>
+          <div class="profile-stat">
+            <div class="profile-stat-val">2h</div>
+            <div class="profile-stat-lbl">Avg Response</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="reviews-list">
+        <h3 class="detail-section-title">Recent Reviews <span class="count">18</span></h3>
+
+        <div class="review-card glass">
+          <div class="review-header">
+            <div class="review-avatar">SK</div>
+            <div>
+              <div class="review-author">Sara Khan</div>
+              <div class="review-date">Jan 28, 2026 · for "Build WordPress portfolio site"</div>
+            </div>
+          </div>
+          <div class="review-stars">
+            <span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span>
+          </div>
+          <p class="review-text">Arish delivered the portfolio site ahead of schedule and the quality exceeded my expectations. Very professional communication throughout. Highly recommend!</p>
+        </div>
+
+        <div class="review-card glass">
+          <div class="review-header">
+            <div class="review-avatar" style="background:linear-gradient(135deg, var(--accent-amber), #FF8F00)">OA</div>
+            <div>
+              <div class="review-author">Omar Ali</div>
+              <div class="review-date">Jan 15, 2026 · for "Fix AC unit in office"</div>
+            </div>
+          </div>
+          <div class="review-stars">
+            <span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star empty">★</span>
+          </div>
+          <p class="review-text">Good work overall. Fixed the issue within a few hours. Communication was a bit slow but the end result was great. Would work with again.</p>
+        </div>
+
+        <div class="review-card glass">
+          <div class="review-header">
+            <div class="review-avatar" style="background:linear-gradient(135deg, var(--accent-green), #00C853)">FM</div>
+            <div>
+              <div class="review-author">Fatima Malik</div>
+              <div class="review-date">Dec 30, 2025 · for "Tutor in Python basics"</div>
+            </div>
+          </div>
+          <div class="review-stars">
+            <span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star">★</span><span class="star empty">★</span>
+          </div>
+          <p class="review-text">Patient teacher, explained concepts clearly. My son went from struggling to actually enjoying coding. Very grateful for the help.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<hr class="section-divider">
+
+<!-- ═════════════════════════════════════════════════════════
+     9. AUTH FORMS
+     ═════════════════════════════════════════════════════════ -->
+<section class="section" id="auth">
+  <div class="container">
+    <span class="section-label">Authentication</span>
+    <h2 class="section-title">Login & Register</h2>
+    <div class="auth-section">
+
+      <!-- Login -->
+      <div class="auth-panel glass-solid">
+        <h3 class="form-title">Welcome back</h3>
+        <p class="form-sub">Sign in to continue to TaskMarket</p>
+        <form onsubmit="return false">
+          <div class="input-group">
+            <label for="login-email">Email</label>
+            <input id="login-email" class="input-field" type="email" placeholder="you@example.com">
+          </div>
+          <div class="input-group">
+            <label for="login-pass">Password</label>
+            <input id="login-pass" class="input-field" type="password" placeholder="••••••••">
+          </div>
+          <button type="submit" class="btn btn-primary btn-lg" style="width:100%;justify-content:center">Sign In</button>
+          <div class="auth-divider">or</div>
+          <button type="button" class="btn btn-ghost" style="width:100%;justify-content:center">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z" fill="#4285F4"/><path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/><path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/><path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/></svg>
+            Continue with Google
+          </button>
+        </form>
+      </div>
+
+      <!-- Register -->
+      <div class="auth-panel glass-solid">
+        <h3 class="form-title">Create account</h3>
+        <p class="form-sub">Join TaskMarket today — it's free</p>
+        <form onsubmit="return false">
+          <div class="form-row">
+            <div class="input-group">
+              <label for="reg-fname">First Name</label>
+              <input id="reg-fname" class="input-field" type="text" placeholder="Arish">
+            </div>
+            <div class="input-group">
+              <label for="reg-lname">Last Name</label>
+              <input id="reg-lname" class="input-field" type="text" placeholder="Rehman">
+            </div>
+          </div>
+          <div class="input-group">
+            <label for="reg-email">Email</label>
+            <input id="reg-email" class="input-field" type="email" placeholder="you@example.com">
+          </div>
+          <div class="input-group">
+            <label for="reg-pass">Password</label>
+            <input id="reg-pass" class="input-field" type="password" placeholder="Min. 8 characters">
+          </div>
+          <button type="submit" class="btn btn-gradient btn-lg" style="width:100%;justify-content:center">Create Account</button>
+        </form>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<hr class="section-divider">
+
+<!-- ═════════════════════════════════════════════════════════
+     10. REPORT DIALOG
+     ═════════════════════════════════════════════════════════ -->
+<section class="section" id="report">
+  <div class="container">
+    <span class="section-label">Moderation</span>
+    <h2 class="section-title">Report Dialog</h2>
+    <div class="modal-overlay">
+      <div class="modal-dialog">
+        <button class="modal-close" aria-label="Close">✕</button>
+        <h3 class="modal-title">Report this task</h3>
+        <p class="modal-sub">Help us keep TaskMarket safe. Your report is confidential.</p>
+        <form onsubmit="return false">
+          <div class="input-group">
+            <label for="report-reason">Reason</label>
+            <select id="report-reason" class="input-field">
+              <option value="">Select a reason…</option>
+              <option>Spam or scam</option>
+              <option>Inappropriate content</option>
+              <option>Harassment or abuse</option>
+              <option>Misleading information</option>
+              <option>Other</option>
+            </select>
+          </div>
+          <div class="input-group">
+            <label for="report-details">Details</label>
+            <textarea id="report-details" class="input-field" placeholder="Provide additional context about this report…" style="min-height:80px"></textarea>
+          </div>
+          <div class="modal-actions">
+            <button type="button" class="btn btn-ghost">Cancel</button>
+            <button type="submit" class="btn btn-magenta">Submit Report</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ═════════════════════════════════════════════════════════
+     11. FOOTER
+     ═════════════════════════════════════════════════════════ -->
+<footer class="footer">
+  <div class="footer-inner">
+    <div class="footer-logo">Task<span class="accent">Market</span></div>
+    <ul class="footer-links">
+      <li><a href="#">About</a></li>
+      <li><a href="#">How It Works</a></li>
+      <li><a href="#">Safety</a></li>
+      <li><a href="#">Terms</a></li>
+      <li><a href="#">Privacy</a></li>
+      <li><a href="#">Contact</a></li>
+    </ul>
+    <p class="footer-copy">&copy; 2026 TaskMarket. All rights reserved. Payment is handled directly between users — TaskMarket does not process transactions.</p>
+  </div>
+</footer>
+
+<!-- ─── Vanilla JS for smooth scroll & minor interactions ── -->
+<script>
+(function() {
+  // Smooth scroll for nav links
+  document.querySelectorAll('a[href^="#"]').forEach(function(a) {
+    a.addEventListener('click', function(e) {
+      var id = this.getAttribute('href');
+      if (id.length < 2) return;
+      var el = document.querySelector(id);
+      if (el) { e.preventDefault(); el.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+    });
+  });
+
+  // Intersection observer for fade-in animation on sections
+  if ('IntersectionObserver' in window) {
+    var items = document.querySelectorAll('.task-card, .offer-card, .review-card, .auth-panel, .profile-card, .form-panel, .chat-container, .dashboard-table-wrap, .modal-overlay');
+    var observer = new IntersectionObserver(function(entries) {
+      entries.forEach(function(entry) {
+        if (entry.isIntersecting) {
+          entry.target.style.opacity = '1';
+          entry.target.style.transform = 'translateY(0)';
+          observer.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.08, rootMargin: '0px 0px -40px' });
+    items.forEach(function(item, i) {
+      item.style.opacity = '0';
+      item.style.transform = 'translateY(24px)';
+      item.style.transition = 'opacity 0.5s ease ' + (i % 4) * 0.08 + 's, transform 0.5s ease ' + (i % 4) * 0.08 + 's';
+      observer.observe(item);
+    });
+  }
+
+  // Active nav state on scroll
+  var sections = document.querySelectorAll('section[id]');
+  var navLinks = document.querySelectorAll('.navbar-links a');
+  window.addEventListener('scroll', function() {
+    var scrollY = window.pageYOffset + 100;
+    sections.forEach(function(sec) {
+      var top = sec.offsetTop;
+      var height = sec.offsetHeight;
+      var id = sec.getAttribute('id');
+      if (scrollY >= top && scrollY < top + height) {
+        navLinks.forEach(function(a) {
+          a.classList.remove('active');
+          if (a.getAttribute('href') === '#' + id) a.classList.add('active');
+        });
+      }
+    });
+  }, { passive: true });
+})();
+</script>
+
+</body>
+</html>
