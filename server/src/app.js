@@ -11,9 +11,16 @@ const errorHandler = require('./middleware/error-handler');
 
 const app = express();
 
+function normalizeOrigin(origin) {
+  return String(origin || '')
+    .trim()
+    .replace(/\/$/, '')
+    .toLowerCase();
+}
+
 const allowedOrigins = String(env.clientOrigin || '')
   .split(',')
-  .map((origin) => origin.trim())
+  .map((origin) => normalizeOrigin(origin))
   .filter(Boolean);
 
 const corsOptions = {
@@ -26,7 +33,14 @@ const corsOptions = {
       return;
     }
 
-    if (allowedOrigins.includes('*') || allowedOrigins.includes(origin)) {
+    if (!allowedOrigins.length) {
+      callback(null, true);
+      return;
+    }
+
+    const incomingOrigin = normalizeOrigin(origin);
+
+    if (allowedOrigins.includes('*') || allowedOrigins.includes(incomingOrigin)) {
       callback(null, true);
       return;
     }
